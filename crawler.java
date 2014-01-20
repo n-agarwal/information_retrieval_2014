@@ -13,11 +13,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -99,13 +101,13 @@ public class Crawler {
 	 */
 	public void crawl() {
 		// maintains a canonical form set of already visited URLs
-		Set<String> visitedURLCanonical = new HashSet<String>();
+		List<String> visitedURLCanonical = new ArrayList<String>();
 		// maintains a canonical form queue of URLs to be visited
 		Queue<String> toVisitURLCanonical = new LinkedList<String>();
 		// maintains a original URLs queue of to be visited
 		Queue<URL> toVisitURLOriginal = new LinkedList<URL>();
 		// maintains a set of URLs listed in the current document
-		Set<URL> containsURLSet = new HashSet<URL>();
+		List<URL> listOutgoingLinksCurrentURL = new ArrayList<URL>();
 		// defines when to stop crawling
 		boolean keepCrawling = true;
 		// start crawling from base URL
@@ -150,7 +152,7 @@ public class Crawler {
 							.userAgent(userAgent).timeout(timeout).get();
 					Elements elements = document.select(selectType);
 					// clear the list of URL read from current page
-					containsURLSet.clear();
+					listOutgoingLinksCurrentURL.clear();
 					// check the valid elements in the document
 					for (Element element : elements) {
 						try {
@@ -159,12 +161,13 @@ public class Crawler {
 							// check for duplicates and rules
 							if (!containsUrlCanonical
 									.equals(currentURLCanonical)
-									&& !containsURLSet.contains(containsURL)
+									&& !listOutgoingLinksCurrentURL
+											.contains(containsURL)
 									&& ((visitMap.containsKey(containsURL) && visitMap
 											.get(containsURL)) || canBeVisited(containsURL))) {
 								//
 								visitMap.put(containsURL, true);
-								containsURLSet.add(containsURL);
+								listOutgoingLinksCurrentURL.add(containsURL);
 								// System.out.print(separationCharacter
 								// + containsUrlCanonical);
 								fileWriter.append(separationCharacter
