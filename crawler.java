@@ -30,6 +30,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.trigonic.jrobotx.RobotExclusion;
+/**
+ * A Crawler is a new Crawler(URL naseURL, int threshold, String userAgent, 
+ *                            Set<String> validContents, int delay, 
+ *                            Set<String> validDomains, String outputFile)
+ * A Crawler object crawls the web starting from the baseURL until either
+ * the threshold value is reached OR the complete tree is traversed.
+ * It also performs checks before visiting a page to ensure the validity.
+ * Maintains a delay between each hit to avoid server overloading
+ * and writes all the URL's and their output links into outputFile
+ * making sure no two different links leads to same page by using 
+ * canonical form of URL's
+ * 
+ * @author Nishant Agarwal
+ *
+ */
 
 public class Crawler {
 
@@ -45,7 +60,7 @@ public class Crawler {
 	// defines the delay (in seconds) between each visit for this object
 	private int delay;
 	// defines the accepted domains for the URL's
-	private Set<String> domains = new HashSet<String>();
+	private Set<String> validDomains = new HashSet<String>();
 	// defines the output file to write output
 	private String outputFile;
 
@@ -88,7 +103,7 @@ public class Crawler {
 		this.userAgent = userAgent;
 		this.validContents = validContents;
 		this.delay = delay;
-		this.domains = domains;
+		this.validDomains = domains;
 		this.outputFile = outputFile;
 	}
 
@@ -246,7 +261,7 @@ public class Crawler {
 	 */
 	private boolean isValidDomain(URL url) {
 		String host = url.getHost();
-		for (String domain : domains) {
+		for (String domain : validDomains) {
 			if (host.contains(domain))
 				return true;
 		}
@@ -301,7 +316,8 @@ public class Crawler {
 
 	/**
 	 * Returns a canonical for of the input url by fetching Host and Path part
-	 * of the input URL and converting into lowercase Ex:
+	 * of the input URL and converting into lowercase 
+	 * Ex:
 	 * https://www.ABCD.com/ajshakjsh#, https://www.ABCD.com/ajshakjsh,
 	 * http://www.ABCD.com/ajshakjsh, http://www.abcd.com/ajshakjsh all these
 	 * above 4 URL's will be returned as www.abcd.com/ajshakjsh
